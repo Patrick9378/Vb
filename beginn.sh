@@ -1,6 +1,33 @@
 #!/bin/zsh
+if [ -z "$XDG_CONFIG_HOME" ]; then
+	XDG_CONFIG_HOME="$HOME/.config"
+fi
+confdir="$XDG_CONFIG_HOME"/Vertretungsplan24bot
+config="$confdir"/config
+if [ ! -d "$confdir" ]; then
+	mkdir -p "$confdir"
+fi
+if [ ! -s "$config" ]; then
+	cat << EOF
+Config file doesn't exist, please create it with the following structure:
+
+$config:
+Classdescription
+HTTP User
+HTTP Password
+Telegram Chat
+Telegram Token
+
+EOF
+	exit 1
+fi
+class="$(sed '1!d' "$config")"
+user="$(sed '2!d' "$config")"
+password="$(sed '3!d' "$config")"
+chat="$(sed '4!d' "$config")"
+token="$(sed '5!d' "$config")"
 _base="$(grep "^ " $1)"
-if [ "$(echo "$_base" | grep -F "B_IF 19/5" )" = "" ]; then
+if [ "$(echo "$_base" | grep -F "$class" )" = "" ]; then
 	exit 1
 fi
 get_offset () {
@@ -35,7 +62,7 @@ until [ $i -gt $lines ]; do
 	#echo "lower: $lower upper: $upper" #DEBUG
 	datum="$(echo "$_base" | sed ${lower}\!d | grep -Eo "([0-9]{2}\.){2}[0-9]{4}")"
 	#echo "$datum" #DEBUG
-	if [ "$(echo "$_base" | sed -n "${lower},${upper}p" | grep -F "B_IF 19/5")" != "" ]; then
+	if [ "$(echo "$_base" | sed -n "${lower},${upper}p" | grep -F "$class")" != "" ]; then
 		#echo "Hier sind wir" #DEBUG
 		tag="$(echo "$_base" | sed ${lower}\!d | head -c "$off_stunde" | tail -c +"$off_tag" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
 		echo "Datum: $datum"
@@ -50,16 +77,16 @@ until [ $i -gt $lines ]; do
 				if [ "$stunde" != "" ]; then
 					echo "Stunde: $stunde"
 				fi
-				if [ "$lehrer" != "" ]; then
+				if [ -n "$lehrer" ]; then
 					echo "Lehrer: $lehrer"
 				fi
-				if [ "$fach" != "" ]; then
+				if [ -n "$fach" ]; then
 					echo "Fach: $fach"
 				fi
-				if [ "$raum" != "" ]; then
+				if [ -n "$raum" ]; then
 					echo "Raum: $raum"
 				fi
-				if [ "$mitteilung" != "" ]; then
+				if [ -n "$mitteilung" ]; then
 					echo "Mitteilung: $mitteilung"
 				fi
 			fi
