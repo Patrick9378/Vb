@@ -47,11 +47,21 @@ until [ $i -gt $lines ]; do
 				fach="$(echo "$_base" | sed ${lower}\!d | head -c "$off_raum" | tail -c +"$off_fach" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
 				raum="$(echo "$_base" | sed ${lower}\!d | head -c "$off_klasse" | tail -c +"$off_raum" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
 				mitteilung="$(echo "$_base" | sed ${lower}\!d | head -c "$off_vlehrer" | tail -c +"$off_mitteilung" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
-				echo "Stunde: $stunde"
-				echo "Lehrer: $lehrer"
-				echo "Fach: $fach"
-				echo "Raum: $raum"
-				echo "Mitteilung: $mitteilung"
+				if [ "$stunde" != "" ]; then
+					echo "Stunde: $stunde"
+				fi
+				if [ "$lehrer" != "" ]; then
+					echo "Lehrer: $lehrer"
+				fi
+				if [ "$fach" != "" ]; then
+					echo "Fach: $fach"
+				fi
+				if [ "$raum" != "" ]; then
+					echo "Raum: $raum"
+				fi
+				if [ "$mitteilung" != "" ]; then
+					echo "Mitteilung: $mitteilung"
+				fi
 			fi
 			let lower++
 		done
