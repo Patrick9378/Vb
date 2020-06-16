@@ -46,6 +46,7 @@ get_offset () {
 block_boundaries="$(echo "$_base" | grep -n Datum | cut -d ":" -f 1)"
 lines="$(echo $block_boundaries | wc -l)"
 i=1
+echo "Vertretung detektiert 😎" | tee -a "$tmpfile"
 until [ $i -gt $lines ]; do
 
 	#echo "$_base" #DEBUG
@@ -76,7 +77,7 @@ until [ $i -gt $lines ]; do
 			datum="$(echo "$_base" | sed ${lower}\!d | grep -Eo "([0-9]{2}\.){2}[0-9]{4}")"
 			tag="$(echo "$_base" | sed ${lower}\!d | head -c "$off_stunde" | tail -c +"$off_tag" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
 			if [ "$datum" != "" ]; then
-				echo ""
+				echo "" | tee -a "$tmpfile"
 				echo "Datum: $datum" | tee -a "$tmpfile"
 			fi
 			if [ "$tag" != "" ]; then
