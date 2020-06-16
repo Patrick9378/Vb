@@ -69,14 +69,19 @@ until [ $i -gt $lines ]; do
 		upper=$(($(echo $block_boundaries | sed ${i}\!d)-1))
 	fi
 	#echo "lower: $lower upper: $upper" #DEBUG
-	datum="$(echo "$_base" | sed ${lower}\!d | grep -Eo "([0-9]{2}\.){2}[0-9]{4}")"
-	#echo "$datum" #DEBUG
 	if [ "$(echo "$_base" | sed -n "${lower},${upper}p" | grep -F "$class")" != "" ]; then
 		#echo "Hier sind wir" #DEBUG
 		tag="$(echo "$_base" | sed ${lower}\!d | head -c "$off_stunde" | tail -c +"$off_tag" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
-		echo "Datum: $datum" | tee -a "$tmpfile"
-		echo "Tag: $tag" | tee -a "$tmpfile"
 		while [ $lower -le $upper ]; do
+			datum="$(echo "$_base" | sed ${lower}\!d | grep -Eo "([0-9]{2}\.){2}[0-9]{4}")"
+			tag="$(echo "$_base" | sed ${lower}\!d | head -c "$off_stunde" | tail -c +"$off_tag" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
+			if [ "$datum" != "" ]; then
+				echo ""
+				echo "Datum: $datum" | tee -a "$tmpfile"
+			fi
+			if [ "$tag" != "" ]; then
+				echo "Tag: $tag" | tee -a "$tmpfile"
+			fi
 			stunde="$(echo "$_base" | sed ${lower}\!d | head -c "$off_lehrer" | tail -c +"$off_stunde" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
 			if [ "$(echo $stunde | grep "[2468]")" = "" ]; then
 				lehrer="$(echo "$_base" | sed ${lower}\!d | head -c "$off_fach" | tail -c +"$off_lehrer" | sed -e 's/^[ ]*//g' -e 's/[ ]*$//g')"
