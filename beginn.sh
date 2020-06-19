@@ -112,7 +112,11 @@ until [ $i -gt $lines ]; do
 done
 
 if [ ! -s "$lasthash" ] || [ "$(cat $lasthash)" != "$(sha512sum $tmpfile | cut -f 1 -d " ")" ]; then
-	curl -s -G --data-urlencode "text=$(cat $tmpfile)" "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat"
+    _lastmsg="$(cat "$confdir/lastmsg")"
+    if [ "$_lastmsg" != "" ]; then
+        curl -s -G "https://api.telegram.org/bot$token/deleteMessage?chat_id=$chat&message_id=$_lastmsg"
+    fi
+	curl -s -G --data-urlencode "text=$(cat $tmpfile)" "https://api.telegram.org/bot$token/sendMessage?chat_id=$chat" | grep -Po "(?<=\"message_id\":)[[:alnum:]]+" > "$confdir/lastmsg"
 	sha512sum "$tmpfile" | cut -f 1 -d " " > "$lasthash"
 fi
 rm "$tmpfile"
